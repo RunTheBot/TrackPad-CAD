@@ -72,12 +72,23 @@ public:
         if(same) {
             const auto a=prev->contacts[0], b=prev->contacts[1], c=s.contacts[0], d=s.contacts[1];
             const double dx=(c.x+d.x-a.x-b.x)/2, dy=(c.y+d.y-a.y-b.y)/2;
-            if(s.shift) { pending[0]+=dx*cfg.pan; pending[1]-=dy*cfg.pan; }
-            else { pending[3]+=dy*cfg.orbit; pending[4]+=dx*cfg.orbit; }
+            // Axis mapping (Frame.axes indices):
+            // [0]=Tx, [1]=Ty, [2]=Tz(zoom), [3]=Rx(tilt up/down), [4]=Ry(tilt left/right), [5]=Rz(roll)
+            if(s.shift) {
+                // Shift + drag: Pan (Tx, Ty)
+                pending[0]+=dx*cfg.pan;      // Tx: horizontal -> pan X
+                pending[1]+=dy*cfg.pan;      // Ty: vertical   -> pan Y (inverted)
+            } else {
+                // No shift + drag: Orbit (Rx, Ry) - currently maps vertical to tilt up/down
+                pending[3]+=dy*cfg.orbit;    // Rx: vertical   -> tilt up/down
+                pending[4]-=dx*cfg.orbit;    // Ry: horizontal -> tilt left/right
+                // TO REMAP: swap pending[3] and pending[4] assignments, or change dy/dx sources
+                // e.g., for vertical -> tilt left/right: pending[4]+=dy*cfg.orbit;
+            }
             const double old_span=distance(a,b), new_span=distance(c,d);
             if(old_span>2 && new_span>2) {
-                pending[2]+=std::log(new_span/old_span)*cfg.zoom;
-                pending[5]+=std::remainder(std::atan2(d.y-c.y,d.x-c.x)-std::atan2(b.y-a.y,b.x-a.x), 2*3.141592653589793)*cfg.roll;
+                pending[2]-=std::log(new_span/old_span)*cfg.zoom;  // Tz: pinch -> zoom
+                pending[5]+=std::remainder(std::atan2(d.y-c.y,d.x-c.x)-std::atan2(b.y-a.y,b.x-a.x), 2*3.141592653589793)*cfg.roll; // Rz: rotate -> roll
             }
         } else clear_motion(); // never jump on contact or modifier transitions
         prev=std::move(s);
