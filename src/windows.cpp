@@ -133,7 +133,8 @@ struct App {
     std::map<HANDLE,std::unique_ptr<Decoder>> decoders;
     HANDLE active_device=nullptr;
     bool armed=false;
-    bool allowed() {return (GetAsyncKeyState(VK_F8)&0x8000) && foreground(target);}
+    bool stream=false;
+    bool allowed() {return stream || ((GetAsyncKeyState(VK_F8)&0x8000) && foreground(target));}
     void input(HRAWINPUT handle) {
         if(!armed || !allowed()) {engine.cancel();return;}
         UINT size=0;
@@ -193,7 +194,7 @@ int devices() {
 }
 int live(const std::wstring& target,bool driver,bool stream) {
     if(target.find_first_of(L"\\/")!=std::wstring::npos) throw std::runtime_error("Use a process basename, e.g. chrome.exe");
-    Output output(driver,stream); App app; app.target=target; quit=false;
+    Output output(driver,stream); App app; app.target=target; app.stream=stream; quit=false;
     const auto instance=GetModuleHandleW(nullptr);
     WNDCLASSW cls{}; cls.hInstance=instance; cls.lpszClassName=L"TrackPadCADCapture"; cls.lpfnWndProc=window_proc;
     if(!RegisterClassW(&cls)) throw std::runtime_error("Cannot register input window");
@@ -203,8 +204,7 @@ int live(const std::wstring& target,bool driver,bool stream) {
     RAWINPUTDEVICE rid{0x0d,0x05,RIDEV_INPUTSINK|RIDEV_DEVNOTIFY,window};
     if(!RegisterRawInputDevices(&rid,1,sizeof(rid))) {DestroyWindow(window);throw std::runtime_error("Touchpad Raw Input registration failed");}
     SetConsoleCtrlHandler(stop,TRUE);
-    std::cout<<"Hold F8 in the target CAD process to enable capture. Ctrl+C exits.\n"
-      "Native Windows gestures are still active: this prototype does not suppress them.\n";
+    if(!stream) std::cout<<"Hold F8 in the target CAD process to enable capture. Ctrl+C exits.\n";
     double next=now_ms();
     while(!quit) {
         const bool allow=app.allowed();

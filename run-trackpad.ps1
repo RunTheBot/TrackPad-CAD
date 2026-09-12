@@ -1,5 +1,5 @@
 param(
-    [ValidatePattern('^[A-Za-z0-9_. -]+\.exe$')][string]$Target = '3DxViewer10.exe',
+    [ValidatePattern('^[A-Za-z0-9_. -]+\.exe$')][string]$Target = 'chrome.exe',
     [ValidateRange(0,86400)][int]$Seconds = 0,
     [ValidateRange(0.1,50.0)][double]$Sensitivity = 5.0,
     [switch]$Validate
@@ -8,7 +8,7 @@ $ErrorActionPreference='Stop'
 $dll=Join-Path $PSScriptRoot 'build/hidmaestro/HIDMaestro.Core.dll'
 if(!(Test-Path $dll)){throw 'HIDMaestro prebuilt DLL missing. See experiments/hidmaestro/README.md.'}
 [Reflection.Assembly]::LoadFrom($dll) | Out-Null
-Add-Type -Path (Join-Path $PSScriptRoot 'src/HidMaestroBridge.cs') -ReferencedAssemblies @($dll,'System.Diagnostics.Process','System.ComponentModel.Primitives','System.Console','System.Threading','System.Threading.Thread','System.Runtime','System.Collections')
+Add-Type -Path (Join-Path $PSScriptRoot 'src/HidMaestroBridge.cs') -ReferencedAssemblies @($dll,'System.Diagnostics.Process','System.ComponentModel.Primitives','System.Console','System.Threading','System.Threading.Thread','System.Runtime','System.Collections','System.Drawing.Common','System.Drawing.Primitives','System.Private.Windows.Core','System.Private.Windows.GdiPlus','System.Windows.Extensions','System.Windows.Forms','System.Windows.Forms.Primitives')
 [HidMaestroBridge]::Check()
 if($Validate){return}
 $hex=(Get-Content -Raw (Join-Path $PSScriptRoot 'experiments/hidmaestro/spacemouse-pro.hex')).Trim()
