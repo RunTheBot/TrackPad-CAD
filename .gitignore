@@ -1,0 +1,7 @@
+/build/
+/driver/x64/
+/driver/Debug/
+/driver/Release/
+*.user
+*.cer
+*.pfx

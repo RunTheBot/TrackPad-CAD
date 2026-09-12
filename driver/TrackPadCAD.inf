@@ -1,0 +1,57 @@
+[Version]
+Signature="$WINDOWS NT$"
+Class=HIDClass
+ClassGuid={745A17A0-74D3-11D0-B6FE-00A0C90F57DA}
+Provider=%Provider%
+CatalogFile=TrackPadCAD.cat
+DriverVer=09/11/2026,0.1.0.0
+PnpLockdown=1
+
+[Manufacturer]
+%Provider%=Models,NTamd64.10.0...16299
+
+[Models.NTamd64.10.0...16299]
+%Device%=Install,Root\TrackPadCAD
+
+[DestinationDirs]
+DriverCopy=13
+
+[SourceDisksNames]
+1=%Disk%,,,
+
+[SourceDisksFiles]
+TrackPadCAD.sys=1
+
+[Install.NT]
+CopyFiles=DriverCopy
+
+[DriverCopy]
+TrackPadCAD.sys
+
+[Install.NT.HW]
+AddReg=LowerFilter
+
+[LowerFilter]
+HKR,,LowerFilters,0x00010000,"vhf"
+
+[Install.NT.Services]
+AddService=TrackPadCAD,0x00000002,Service
+
+[Service]
+DisplayName=%Device%
+ServiceType=1
+StartType=3
+ErrorControl=1
+ServiceBinary=%13%\TrackPadCAD.sys
+
+[Install.NT.Wdf]
+KmdfService=TrackPadCAD,Wdf
+
+[Wdf]
+KmdfLibraryVersion=1.15
+
+[Strings]
+Provider="TrackPad CAD Prototype"
+Device="TrackPad CAD Experimental Multi-axis Controller"
+Disk="TrackPad CAD Driver"
+
