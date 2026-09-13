@@ -8,17 +8,17 @@ From the workspace in PowerShell:
 gsudo pwsh -NoProfile -File run-trackpad.ps1
 ```
 
-The app starts disabled. Press F8 once to enable it and again to disable it. The tray icon is green while enabled and gray while disabled; double-clicking it also toggles. Right-click it for Enable/Disable and Exit. Output and native wheel suppression only apply while the configured target process is foreground. Ctrl+C also exits.
+The app starts disabled unless `StartEnabled` is set in `TrackPad CAD.json`. Press F8 once to enable it and again to disable it. The tray icon is green while enabled and gray while disabled; double-clicking it also toggles. Right-click it for Enable/Disable and Exit. Native programs use the configured executable allowlist. Browser pages use the companion extension's focused-page URL and 3DconnexionJS WebSocket heartbeat. Ctrl+C also exits when run from a console.
 
-Sensitivity defaults to 5× the original prototype. Use `-Sensitivity 10` for stronger motion or `-Sensitivity 1` for the original gain. This scales all six motion axes; reports remain bounded to ±350. Restart the bridge after changing the setting.
+The packaged configuration uses sensitivity 30. Change `Sensitivity` in `TrackPad CAD.json`; reports remain bounded to ±350. Restart the bridge after changing the setting.
 
 ```powershell
-gsudo pwsh -NoProfile -File run-trackpad.ps1 -Target chrome.exe
+gsudo pwsh -NoProfile -File run-trackpad.ps1 -Config '.\TrackPad CAD.json'
 ```
 
 The target is a process basename, so browser targeting includes all its tabs. Two fingers orbit, Shift + two fingers pan, pinch zooms, twist rolls. Three-finger tap emits button 1 (bind in 3DxWare). Double-tap pivot is only logged and needs a CAD adapter. Capture currently accepts complete parallel Precision Touchpad reports.
 
-While enabled in the target, the app blocks low-level vertical and horizontal wheel messages. That suppresses Windows two-finger scrolling and Ctrl+wheel pinch output, but it also blocks a physical mouse wheel in that target. Windows shell-level three/four-finger actions are configured before application input and cannot be universally intercepted by this app; set those gestures to `Nothing` in Windows Touchpad settings if they conflict.
+While enabled and the target is foreground, the app reads the current `TOUCHPAD_PARAMETERS`, temporarily clears `panEnabled` and `zoomEnabled` with `SPI_SETTOUCHPADPARAMETERS`, and restores the saved parameters on focus loss, disable, or exit. It omits `SPIF_UPDATEINIFILE`, so the override is not persisted to the user's profile. Physical mouse-wheel input is unaffected. This requires Windows 11 version 24H2 or newer.
 
 The launcher uses the existing HIDMaestro installation; it does not reinstall the WDK or certificates. It needs PowerShell 7 on .NET 10, elevation, the compiled `build/trackpad-cad.exe`, and `build/hidmaestro/HIDMaestro.Core.dll`. The latter was extracted from the upstream v1.7.3 prebuilt release (119 MB archive). Release archive SHA256: `A337DDC70E90FF969DEAAAAD8C3F3F8B7A0EE5B61A6A9FF6183CA35950BD8503`.
 

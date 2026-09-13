@@ -77,18 +77,18 @@ public:
             if(s.shift) {
                 // Shift + drag: Pan (Tx, Ty)
                 pending[0]+=dx*cfg.pan;      // Tx: horizontal -> pan X
-                pending[1]+=dy*cfg.pan;      // Ty: vertical   -> pan Y (inverted)
+                pending[2]+=dy*cfg.pan;      // Ty: vertical   -> pan Y (inverted)
             } else {
                 // No shift + drag: Orbit (Rx, Ry) - currently maps vertical to tilt up/down
                 pending[3]+=dy*cfg.orbit;    // Rx: vertical   -> tilt up/down
-                pending[4]-=dx*cfg.orbit;    // Ry: horizontal -> tilt left/right
+                pending[5]-=dx*cfg.orbit;    // Ry: horizontal -> tilt left/right
                 // TO REMAP: swap pending[3] and pending[4] assignments, or change dy/dx sources
                 // e.g., for vertical -> tilt left/right: pending[4]+=dy*cfg.orbit;
             }
             const double old_span=distance(a,b), new_span=distance(c,d);
             if(old_span>2 && new_span>2) {
-                pending[2]-=std::log(new_span/old_span)*cfg.zoom;  // Tz: pinch -> zoom
-                pending[5]+=std::remainder(std::atan2(d.y-c.y,d.x-c.x)-std::atan2(b.y-a.y,b.x-a.x), 2*3.141592653589793)*cfg.roll; // Rz: rotate -> roll
+                pending[1]+=std::log(new_span/old_span)*cfg.zoom;  // Tz: pinch -> zoom
+                pending[4]-=std::remainder(std::atan2(d.y-c.y,d.x-c.x)-std::atan2(b.y-a.y,b.x-a.x), 2*3.141592653589793)*cfg.roll; // Rz: rotate -> roll
             }
         } else clear_motion(); // never jump on contact or modifier transitions
         prev=std::move(s);

@@ -1,0 +1,13 @@
+{
+  "Sensitivity": 30.0,
+  "StartEnabled": false,
+  "NativeExecutables": [
+    "blender.exe",
+    "FreeCAD.exe",
+    "Fusion360.exe",
+    "SLDWORKS.exe"
+  ],
+  "BrowserUrlPrefixes": [
+    "https://cad.onshape.com/"
+  ]
+}
