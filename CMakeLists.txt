@@ -17,6 +17,8 @@ if(WIN32)
     DEPENDS "${CMAKE_SOURCE_DIR}/tools/make-icon.ps1")
   add_custom_target(trackpad-icon DEPENDS "${TRACKPAD_ICON}")
   configure_file("${CMAKE_SOURCE_DIR}/src/launcher.rc.in" "${CMAKE_BINARY_DIR}/launcher.rc" @ONLY)
+  set_source_files_properties("${CMAKE_BINARY_DIR}/launcher.rc" PROPERTIES OBJECT_DEPENDS
+    "${CMAKE_SOURCE_DIR}/run-trackpad.ps1;${CMAKE_SOURCE_DIR}/src/HidMaestroBridge.cs;${CMAKE_SOURCE_DIR}/build/hidmaestro/HIDMaestro.Core.dll;${CMAKE_SOURCE_DIR}/experiments/hidmaestro/spacemouse-pro.hex;${CMAKE_SOURCE_DIR}/TrackPad CAD.json;${CMAKE_SOURCE_DIR}/browser-extension/main-hook.js;${CMAKE_SOURCE_DIR}/browser-extension/relay.js;${CMAKE_SOURCE_DIR}/browser-extension/manifest.json")
   add_executable(trackpad-cad-launcher WIN32 src/launcher.cpp src/main.cpp src/windows.cpp "${CMAKE_BINARY_DIR}/launcher.rc")
   add_dependencies(trackpad-cad-launcher trackpad-icon)
   target_link_libraries(trackpad-cad-launcher PRIVATE gesture hid user32 shell32 ole32)

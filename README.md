@@ -16,7 +16,7 @@ Download and install **3DxWare 10 for Windows** from [3Dconnexion's driver page]
 
 Open TrackPad CAD from either shortcut and accept the elevation prompt. Start 3DxWare if it is not already running.
 
-Focus the CAD program you want to control, then press **F8**. The tray icon turns green when TrackPad CAD is enabled and gray when it is disabled. Press F8 again, use the tray menu, or exit the tray app to stop it.
+Focus the CAD program you want to control, then press **F8**. The tray icon is gray when disabled, yellow while enabled and waiting for a supported CAD target, and green while it is controlling that target. Press F8 again, use the tray menu, or exit the tray app to stop it.
 
 Pin the tray icon if needed.
 
