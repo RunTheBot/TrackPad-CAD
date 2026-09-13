@@ -1,0 +1,19 @@
+#define IDI_TRACKPAD_CAD 101
+#define R_SCRIPT 201
+#define R_BRIDGE 202
+#define R_HIDMAESTRO 203
+#define R_DESCRIPTOR 204
+#define R_CONFIG 205
+#define R_HOOK_MAIN 206
+#define R_HOOK_RELAY 207
+#define R_HOOK_MANIFEST 208
+
+IDI_TRACKPAD_CAD ICON "@TRACKPAD_ICON@"
+R_SCRIPT RCDATA "@CMAKE_SOURCE_DIR@/run-trackpad.ps1"
+R_BRIDGE RCDATA "@CMAKE_SOURCE_DIR@/src/HidMaestroBridge.cs"
+R_HIDMAESTRO RCDATA "@CMAKE_SOURCE_DIR@/build/hidmaestro/HIDMaestro.Core.dll"
+R_DESCRIPTOR RCDATA "@CMAKE_SOURCE_DIR@/experiments/hidmaestro/spacemouse-pro.hex"
+R_CONFIG RCDATA "@CMAKE_SOURCE_DIR@/TrackPad CAD.json"
+R_HOOK_MAIN RCDATA "@CMAKE_SOURCE_DIR@/browser-extension/main-hook.js"
+R_HOOK_RELAY RCDATA "@CMAKE_SOURCE_DIR@/browser-extension/relay.js"
+R_HOOK_MANIFEST RCDATA "@CMAKE_SOURCE_DIR@/browser-extension/manifest.json"

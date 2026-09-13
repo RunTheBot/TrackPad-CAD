@@ -21,7 +21,7 @@ This implements the requested interaction pattern, not a port of Blender source.
 
 Double-click `TrackPad CAD.exe`. Accept the elevation prompt, focus a CAD application connected through the 3Dconnexion SDK, then press **F8** once to enable input. Press F8 again to disable it. Right-click the tray icon for the same controls or to exit.
 
-Edit `TrackPad CAD.json` beside the executable to change startup behavior:
+Edit `%LOCALAPPDATA%\TrackPad CAD\runtime\TrackPad CAD.json` to change startup behavior:
 
 ```json
 {
@@ -32,15 +32,21 @@ Edit `TrackPad CAD.json` beside the executable to change startup behavior:
 }
 ```
 
-The current workspace build is `build/trackpad-cad.exe`. Its diagnostic commands are:
-
-The current workspace build is `build/trackpad-cad.exe`. From this directory:
+The diagnostic capture build is `build/trackpad-cad.exe`. From this directory:
 
 ```powershell
 .\build\trackpad-cad.exe devices
 .\build\trackpad-cad.exe replay examples/gestures.txt
 .\build\trackpad-cad.exe live chrome.exe
 ```
+
+## Packaged Windows app
+
+`TrackPad CAD.exe` is the single-file application. On first launch it extracts its embedded bridge, HID descriptor, browser detector and default configuration to `%LOCALAPPDATA%\TrackPad CAD\runtime`, then starts the tray app. The configuration file is preserved across launches at `%LOCALAPPDATA%\TrackPad CAD\runtime\TrackPad CAD.json`.
+
+`TrackPad CAD Setup.exe` installs that same single-file application per-user at `%LOCALAPPDATA%\Programs\TrackPad CAD\TrackPad CAD.exe`, adds desktop and Start menu shortcuts, registers it in **Settings → Apps → Installed apps**, and starts it. PowerShell 7 remains required because the embedded HIDMaestro bridge is compiled at launch. The tray icon is a diagonal green/gray split with the TrackPad CAD mark.
+
+Use **Uninstall** from Windows Installed apps to remove TrackPad CAD. The uninstaller asks for confirmation, then removes the installed executable, runtime files, saved `TrackPad CAD.json`, browser-extension files, shortcuts, and its Installed Apps registration.
 
 Native CAD programs are selected by the foreground executable allowlist in the configuration. Browser CAD is selected by the extension in `browser-extension`: it observes the page's 3DconnexionJS WebSocket before TLS encryption and publishes a short-lived SDK/URL heartbeat to `127.0.0.1:17831`. The bridge requires an open SDK connection, a focused visible tab, and a matching `BrowserUrlPrefixes` entry.
 
@@ -49,6 +55,29 @@ To load the browser detector in Chrome or Edge, open the extensions page, enable
 The capture tool reads the Precision Touchpad HID collection through Windows Raw Input. It supports complete **parallel contact reports**, using contact IDs, tip switches, optional confidence flags and physically calibrated coordinates. Partial/hybrid reports are rejected instead of guessed. Device enumeration alone does not prove report delivery or successful decoding.
 
 While enabled and the target is foreground, the tray bridge uses Windows 11's dynamic touchpad API to temporarily disable Windows two-finger pan and pinch handling. It saves the current settings and restores them when F8 is toggled off, focus leaves the target, or the bridge exits. The override is not written to the user profile, and physical mouse-wheel input remains available.
+
+## For developers
+
+The application has three cooperating layers. `src/main.cpp` and `include/gesture.hpp` turn decoded touchpad contacts into six-axis frames. `src/windows.cpp` reads Precision Touchpad Raw Input. `src/HidMaestroBridge.cs`, compiled by `run-trackpad.ps1`, owns the tray icon, F8 hotkey, target selection, temporary Windows gesture suppression, and writes frames to HIDMaestro.
+
+`src/launcher.cpp` is the Windows GUI entry point. It embeds the PowerShell bridge, C# source, HIDMaestro assembly, descriptor, configuration template, and browser extension as resources, extracts them to the local runtime directory, then launches PowerShell 7. `tools/make-icon.ps1` draws the embedded diagonal green/gray `.ico`; it does not use an external image asset or image generator. `TrackPad CAD Setup.exe` is the same binary and switches to per-user installation based on its filename.
+
+The browser extension is deliberately small. `browser-extension/main-hook.js` runs in the page's main world and observes creation of 3DconnexionJS WebSockets. `relay.js` forwards an active, focused CAD tab heartbeat to the loopback listener in the bridge. Keep this boundary narrow: the extension identifies a valid browser CAD context, while all HID output remains in the desktop process.
+
+To make code changes, build the launcher target after editing any embedded resource so CMake regenerates the resource bundle:
+
+```powershell
+cmake -S . -B build -G "MinGW Makefiles" -DCMAKE_MAKE_PROGRAM=C:/Strawberry/c/bin/mingw32-make.exe -DCMAKE_CXX_COMPILER=C:/Strawberry/c/bin/g++.exe
+cmake --build build --target trackpad-cad-launcher
+```
+
+Use the replay command before testing live input. It runs the gesture engine against `examples/gestures.txt` and prints the generated frames without touching the virtual HID device:
+
+```powershell
+.\TrackPad CAD.exe --capture replay .\examples\gestures.txt
+```
+
+For live development, exit the tray app before relaunching it so the global F8 hotkey is available. The HIDMaestro driver must be installed and 3DxWare must be running. Test changes first in the 3Dconnexion Viewer, then in a CAD application. Do not modify Windows touchpad registry settings; the bridge uses the dynamic Windows API and restores the prior gesture state when it deactivates.
 
 ## Build and test user mode
 

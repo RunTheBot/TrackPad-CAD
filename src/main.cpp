@@ -10,7 +10,7 @@ static void print(double ms,const tpc::Frame& f) {
     std::cout<<ms; for(auto a:f.axes) std::cout<<","<<a;
     std::cout<<","<<f.buttons<<"\n";
 }
-int main(int argc,char** argv) try {
+int capture_main(int argc,char** argv) try {
     if(argc==3 && std::string(argv[1])=="replay") {
         std::ifstream in(argv[2]); if(!in) throw std::runtime_error("Cannot open replay file");
         tpc::Engine engine; std::string line; double last=-1, next=0;
@@ -50,3 +50,7 @@ int main(int argc,char** argv) try {
       "Default live output is a diagnostic trace. --driver requires the test VHF driver.\n";
     return argc==1 ? 0 : 2;
 } catch(const std::exception& e) {std::cerr<<"Error: "<<e.what()<<"\n"; return 1;}
+
+#ifndef TPC_CAPTURE_LIBRARY
+int main(int argc,char** argv){return capture_main(argc,argv);}
+#endif

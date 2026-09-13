@@ -3,9 +3,12 @@ param(
     [ValidateRange(0,86400)][int]$Seconds = 0,
     [ValidateRange(0.1,50.0)][double]$Sensitivity = 5.0,
     [string]$Config,
+    [string]$CaptureExecutable,
     [switch]$Validate
 )
 $ErrorActionPreference='Stop'
+if(!$CaptureExecutable){$CaptureExecutable=Join-Path $PSScriptRoot 'build/trackpad-cad.exe'}
+if(!(Test-Path -LiteralPath $CaptureExecutable)){throw "Capture executable missing: $CaptureExecutable"}
 if($Config){
     $configPath=$ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Config)
     $settings=Get-Content -Raw -LiteralPath $configPath | ConvertFrom-Json
@@ -27,7 +30,7 @@ $profile=$builder.Id('trackpad-spacemouse-live').Name('SpaceMouse Pro test').Ven
 $ctx=[HIDMaestro.HMContext]::new()
 $controller=$null
 try {
-    if(!$ctx.IsDriverInstalled){throw 'HIDMaestro driver is not installed. Run the approved setup test first.'}
+    if(!$ctx.IsDriverInstalled){Write-Host 'Installing the HIDMaestro virtual-device driver...';$ctx.InstallDriver();if(!$ctx.IsDriverInstalled){throw 'HIDMaestro driver installation did not complete.'}}
     $controller=$ctx.CreateController($profile)
-    [HidMaestroBridge]::Run($controller,(Join-Path $PSScriptRoot 'build/trackpad-cad.exe'),$Target,$Seconds,$Sensitivity,$StartEnabled,$NativeExecutables,$BrowserUrlPrefixes)
+    [HidMaestroBridge]::Run($controller,$CaptureExecutable,$Target,$Seconds,$Sensitivity,$StartEnabled,$NativeExecutables,$BrowserUrlPrefixes)
 } finally {if($controller){$controller.Dispose()};$ctx.Dispose()}
