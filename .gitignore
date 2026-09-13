@@ -1,4 +1,6 @@
 /build/
+/TrackPad CAD.exe
+/TrackPad CAD Setup.exe
 /driver/x64/
 /driver/Debug/
 /driver/Release/

@@ -1,18 +1,18 @@
 {
   "manifest_version": 3,
   "name": "TrackPad CAD SDK Detector",
-  "version": "1.0.0",
-  "description": "Detects an active 3DconnexionJS connection for TrackPad CAD.",
+  "version": "1.0.1",
+  "description": "Checks existing 3DconnexionJS connections in Onshape for TrackPad CAD.",
   "host_permissions": ["http://127.0.0.1:17831/*"],
   "content_scripts": [
     {
-      "matches": ["http://*/*", "https://*/*"],
+      "matches": ["https://cad.onshape.com/*"],
       "js": ["main-hook.js"],
       "run_at": "document_start",
       "world": "MAIN"
     },
     {
-      "matches": ["http://*/*", "https://*/*"],
+      "matches": ["https://cad.onshape.com/*"],
       "js": ["relay.js"],
       "run_at": "document_start"
     }
