@@ -14,9 +14,10 @@ if($Config){
     $settings=Get-Content -Raw -LiteralPath $configPath | ConvertFrom-Json
     if($null -ne $settings.Sensitivity){$Sensitivity=[double]$settings.Sensitivity}
     $StartEnabled=($settings.StartEnabled -eq $true)
+    $ToggleKey=if($null -ne $settings.ToggleKey){[string]$settings.ToggleKey}else{'F8'}
     $NativeExecutables=@($settings.NativeExecutables | ForEach-Object {[string]$_})
     $BrowserUrlPrefixes=@($settings.BrowserUrlPrefixes | ForEach-Object {[string]$_})
-}else{$StartEnabled=$false;$NativeExecutables=@();$BrowserUrlPrefixes=@()}
+}else{$StartEnabled=$false;$ToggleKey='F8';$NativeExecutables=@();$BrowserUrlPrefixes=@()}
 if($Sensitivity -lt 0.1 -or $Sensitivity -gt 50){throw 'Sensitivity in the configuration must be between 0.1 and 50.'}
 $dll=Join-Path $PSScriptRoot 'build/hidmaestro/HIDMaestro.Core.dll'
 if(!(Test-Path $dll)){throw 'HIDMaestro prebuilt DLL missing. See experiments/hidmaestro/README.md.'}
@@ -32,5 +33,5 @@ $controller=$null
 try {
     if(!$ctx.IsDriverInstalled){Write-Host 'Installing the HIDMaestro virtual-device driver...';$ctx.InstallDriver();if(!$ctx.IsDriverInstalled){throw 'HIDMaestro driver installation did not complete.'}}
     $controller=$ctx.CreateController($profile)
-    [HidMaestroBridge]::Run($controller,$CaptureExecutable,$Target,$Seconds,$Sensitivity,$StartEnabled,$NativeExecutables,$BrowserUrlPrefixes)
+    [HidMaestroBridge]::Run($controller,$CaptureExecutable,$Target,$Seconds,$Sensitivity,$StartEnabled,$ToggleKey,$NativeExecutables,$BrowserUrlPrefixes)
 } finally {if($controller){$controller.Dispose()};$ctx.Dispose()}

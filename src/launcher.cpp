@@ -70,7 +70,7 @@ bool register_app(const std::filesystem::path& executable) {
     if(RegCreateKeyExW(HKEY_CURRENT_USER,subkey,0,nullptr,0,KEY_SET_VALUE,nullptr,&key,nullptr)!=ERROR_SUCCESS) return false;
     auto set_text=[&](const wchar_t* name,const std::wstring& value) { return RegSetValueExW(key,name,0,REG_SZ,reinterpret_cast<const BYTE*>(value.c_str()),static_cast<DWORD>((value.size()+1)*sizeof(wchar_t)))==ERROR_SUCCESS; };
     DWORD one=1;
-    const bool result=set_text(L"DisplayName",L"TrackPad CAD") && set_text(L"DisplayVersion",L"1.0.0") && set_text(L"Publisher",L"TrackPad CAD")
+    const bool result=set_text(L"DisplayName",L"TrackPad CAD") && set_text(L"DisplayVersion",L"1.0.3") && set_text(L"Publisher",L"TrackPad CAD")
         && set_text(L"InstallLocation",executable.parent_path().wstring()) && set_text(L"DisplayIcon",executable.wstring())
         && set_text(L"UninstallString",quote(executable)+L" --uninstall")
         && RegSetValueExW(key,L"NoModify",0,REG_DWORD,reinterpret_cast<const BYTE*>(&one),sizeof(one))==ERROR_SUCCESS

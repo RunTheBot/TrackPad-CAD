@@ -8,7 +8,7 @@ From the workspace in PowerShell:
 gsudo pwsh -NoProfile -File run-trackpad.ps1
 ```
 
-The app starts disabled unless `StartEnabled` is set in `TrackPad CAD.json`. Press F8 once to enable it and again to disable it. The tray icon is green while enabled and gray while disabled; double-clicking it also toggles. Right-click it for Enable/Disable and Exit. Native programs use the configured executable allowlist. Browser pages use the companion extension's focused-page URL and 3DconnexionJS WebSocket heartbeat. Ctrl+C also exits when run from a console.
+The app starts disabled unless `StartEnabled` is set in `TrackPad CAD.json`. Press the configured `ToggleKey` (F8 by default) once to enable it and again to disable it. The tray icon is green while enabled and gray while disabled; double-clicking it also toggles. Right-click it for Enable/Disable and Exit. Native programs use the configured executable allowlist. Browser pages use the companion extension's focused-page URL and 3DconnexionJS WebSocket heartbeat. Ctrl+C also exits when run from a console.
 
 The packaged configuration uses sensitivity 30. Change `Sensitivity` in `TrackPad CAD.json`; reports remain bounded to ±350. Restart the bridge after changing the setting.
 

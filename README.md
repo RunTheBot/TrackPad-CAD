@@ -16,7 +16,7 @@ Download and install **3DxWare 10 for Windows** from [3Dconnexion's driver page]
 
 Open TrackPad CAD from either shortcut and accept the elevation prompt. Start 3DxWare if it is not already running.
 
-Focus the CAD program you want to control, then press **F8**. The tray icon is gray when disabled, yellow while enabled and waiting for a supported CAD target, and green while it is controlling that target. Press F8 again, use the tray menu, or exit the tray app to stop it.
+Focus the CAD program you want to control, then press **F8**. The tray icon is gray when disabled, yellow while enabled and waiting for a supported CAD target, and green while it is controlling that target. Press the configured toggle key again, use the tray menu, or exit the tray app to stop it.
 
 Pin the tray icon if needed.
 
@@ -45,19 +45,20 @@ After the first launch, the settings file is here:
 {
   "Sensitivity": 30.0,
   "StartEnabled": false,
+  "ToggleKey": "F8",
   "NativeExecutables": ["blender.exe", "FreeCAD.exe", "Fusion360.exe", "SLDWORKS.exe"],
   "BrowserUrlPrefixes": ["https://cad.onshape.com/"]
 }
 ```
 
-Set `Sensitivity` higher for faster movement. TrackPad CAD only sends input to native applications listed in `NativeExecutables` while that application is focused.
+Set `Sensitivity` higher for faster movement. `ToggleKey` accepts a letter, `F1` through `F24`, or `Space`, `Tab`, `Escape`, `Pause`, `CapsLock`, `Insert`, `Delete`, `Home`, `End`, `PageUp`, or `PageDown`. TrackPad CAD only sends input to native applications listed in `NativeExecutables` while that application is focused. The physical **Fn** key cannot be used directly: it normally does not send a Windows key code. If your keyboard software maps Fn to a standard key, put that mapped key here.
 
 ### 5. Set up Onshape
 
 1. Open `chrome://extensions` or `edge://extensions`.
 2. Turn on **Developer mode**, choose **Load unpacked**, and select `%LOCALAPPDATA%\TrackPad CAD\runtime\browser-extension`.
 3. Reload Onshape, open a document at `https://cad.onshape.com/`, and click in the graphics area.
-4. Enable TrackPad CAD with F8 and use the gestures above.
+4. Enable TrackPad CAD with the configured toggle key and use the gestures above.
 
 TrackPad CAD sends motion only when the focused Onshape tab has an active 3DconnexionJS connection. If it does not respond, make sure the tray icon is green, reload the tab, and check that `BrowserUrlPrefixes` still includes `https://cad.onshape.com/`.
 
@@ -72,7 +73,7 @@ Use **Uninstall** from Windows Installed apps. After confirmation, it removes th
 - `include/gesture.hpp` maps touchpad contacts to six-axis frames.
 - `src/main.cpp` provides replay and live capture entry points.
 - `src/windows.cpp` reads Precision Touchpad data through Windows Raw Input.
-- `src/HidMaestroBridge.cs` owns the tray icon, F8 hotkey, target checks, temporary gesture suppression, and HIDMaestro output.
+- `src/HidMaestroBridge.cs` owns the tray icon, configurable toggle hotkey, target checks, temporary gesture suppression, and HIDMaestro output.
 - `run-trackpad.ps1` compiles and starts the bridge.
 - `src/launcher.cpp` packages the application and installs or uninstalls it.
 - `browser-extension/` detects 3DconnexionJS activity in browser CAD.

@@ -1,6 +1,7 @@
 {
   "Sensitivity": 30.0,
   "StartEnabled": false,
+  "ToggleKey": "F8",
   "NativeExecutables": [
     "blender.exe",
     "FreeCAD.exe",
