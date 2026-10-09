@@ -58,9 +58,9 @@ Set `Sensitivity` higher for faster movement. `ToggleKey` accepts a letter, `F1`
 1. Open `chrome://extensions` or `edge://extensions`.
 2. Turn on **Developer mode**, choose **Load unpacked**, and select `%LOCALAPPDATA%\TrackPad CAD\runtime\browser-extension`.
 3. Reload Onshape, open a document at `https://cad.onshape.com/`, and click in the graphics area.
-4. Enable TrackPad CAD with the configured toggle key and use the gestures above.
+4. Enable TrackPad CAD with the configured toggle key, hover over the graphics canvas, and use the gestures above.
 
-TrackPad CAD sends motion only when the focused Onshape tab has an active 3DconnexionJS connection. If it does not respond, make sure the tray icon is green, reload the tab, and check that `BrowserUrlPrefixes` still includes `https://cad.onshape.com/`.
+TrackPad CAD sends motion only when the focused Onshape tab has an active 3DconnexionJS connection and the pointer is over its `canvas#canvas` graphics area. Moving into toolbars, panels, or menus deactivates it. If it does not respond, make sure the tray icon is green, reload the tab, and check that `BrowserUrlPrefixes` still includes `https://cad.onshape.com/`.
 
 ### 6. Uninstall
 
@@ -81,7 +81,7 @@ Use **Uninstall** from Windows Installed apps. After confirmation, it removes th
 
 The packaged EXE embeds the bridge, HIDMaestro assembly, HID descriptor, default configuration, and extension files. On first launch it extracts them to `%LOCALAPPDATA%\TrackPad CAD\runtime`. The existing JSON file is kept when the application updates.
 
-The browser extension only reports whether a focused tab has an active 3DconnexionJS WebSocket. It sends that heartbeat to the local bridge at `127.0.0.1:17831`; HID reports are produced only by the desktop process.
+The browser extension reports an active 3DconnexionJS WebSocket only while the focused tab's pointer is over Onshape's `canvas#canvas`. It sends that heartbeat to the local bridge at `127.0.0.1:17831` and clears it when the pointer leaves the canvas; HID reports are produced only by the desktop process.
 
 ### Build
 
@@ -110,6 +110,12 @@ Run the gesture tests:
 
 ```powershell
 ctest --test-dir build --output-on-failure
+```
+
+Run the browser extension hover and SDK relay tests with Node.js:
+
+```powershell
+node --test tests/browser-extension.test.cjs
 ```
 
 Use replay before testing live input:

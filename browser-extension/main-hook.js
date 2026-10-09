@@ -1,6 +1,11 @@
 (() => {
   const NativeWebSocket = window.WebSocket;
   const sdkSockets = new Set();
+  let hoveredCanvas = null;
+  const canvasAt = target => {
+    const canvas = document.querySelector("canvas#canvas");
+    return canvas && target === canvas ? canvas : null;
+  };
   const is3Dx = value => {
     try {
       const url = new URL(String(value), location.href);
@@ -9,7 +14,8 @@
   };
   const announce = () => window.postMessage({
     source: "trackpad-cad-3dx-hook",
-    active: document.visibilityState === "visible" && document.hasFocus(),
+    active: document.visibilityState === "visible" && document.hasFocus() &&
+      hoveredCanvas !== null && hoveredCanvas === document.querySelector("canvas#canvas"),
     sdk: sdkSockets.size > 0,
     url: location.href
   }, "*");
@@ -28,8 +34,28 @@
   for (const key of ["CONNECTING", "OPEN", "CLOSING", "CLOSED"])
     Object.defineProperty(HookedWebSocket, key, { value: NativeWebSocket[key] });
   window.WebSocket = HookedWebSocket;
-  document.addEventListener("visibilitychange", announce);
-  window.addEventListener("focus", announce);
-  window.addEventListener("blur", announce);
+  const updateHover = target => {
+    const canvas = canvasAt(target);
+    if (canvas === hoveredCanvas) return;
+    hoveredCanvas = canvas;
+    announce();
+  };
+  document.addEventListener("pointerover", event => updateHover(event.target), true);
+  document.addEventListener("pointermove", event => updateHover(event.target), true);
+  document.addEventListener("pointerout", event => updateHover(event.relatedTarget), true);
+  document.addEventListener("pointerleave", () => updateHover(null));
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible") hoveredCanvas = null;
+    announce();
+  });
+  window.addEventListener("focus", () => {
+    const canvas = document.querySelector("canvas#canvas");
+    hoveredCanvas = canvas?.matches(":hover") ? canvas : null;
+    announce();
+  });
+  window.addEventListener("blur", () => {
+    hoveredCanvas = null;
+    announce();
+  });
   announce();
 })();
