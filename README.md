@@ -1,6 +1,6 @@
 # TrackPad CAD
 
-TrackPad CAD turns Precision Touchpad gestures into SpaceMouse-style six-axis input for CAD programs that work with 3DxWare. It uses HIDMaestro to present a SpaceMouse Pro-compatible virtual HID device.
+TrackPad CAD turns Precision Touchpad gestures into SpaceMouse-style six-axis input for CAD programs that work with 3DxWare. It uses [HIDMaestro](https://github.com/hifihedgehog/HIDMaestro) to present a SpaceMouse Pro-compatible virtual HID device.
 
 ## User guide
 
@@ -79,7 +79,7 @@ Use **Uninstall** from Windows Installed apps. After confirmation, it removes th
 - `browser-extension/` detects 3DconnexionJS activity in browser CAD.
 - `tools/make-icon.ps1` generates the embedded diagonal green/gray icon.
 
-The packaged EXE embeds the bridge, HIDMaestro assembly, HID descriptor, default configuration, and extension files. On first launch it extracts them to `%LOCALAPPDATA%\TrackPad CAD\runtime`. The existing JSON file is kept when the application updates.
+The packaged EXE embeds the bridge, HIDMaestro assembly and license, HID descriptor, default configuration, and extension files. On first launch it extracts them to `%LOCALAPPDATA%\TrackPad CAD\runtime`. HIDMaestro's MIT license is extracted to `build\hidmaestro\LICENSE` beside `HIDMaestro.Core.dll`; the repository copy is [third-party/HIDMaestro/LICENSE](third-party/HIDMaestro/LICENSE). The existing JSON file is kept when the application updates.
 
 The browser extension reports an active 3DconnexionJS WebSocket only while the focused tab's pointer is over Onshape's `canvas#canvas`. It sends that heartbeat to the local bridge at `127.0.0.1:17831` and clears it when the pointer leaves the canvas; HID reports are produced only by the desktop process.
 

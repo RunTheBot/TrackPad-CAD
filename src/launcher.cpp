@@ -11,6 +11,7 @@ int capture_main(int argc, char** argv);
 
 namespace {
 constexpr int R_SCRIPT=201, R_BRIDGE=202, R_HIDMAESTRO=203, R_DESCRIPTOR=204, R_CONFIG=205, R_HOOK_MAIN=206, R_HOOK_RELAY=207, R_HOOK_MANIFEST=208;
+constexpr int R_HIDMAESTRO_LICENSE=209;
 std::wstring quote(const std::filesystem::path& value) { return L"\"" + value.wstring() + L"\""; }
 std::string utf8(const std::wstring& input) {
     const int size=WideCharToMultiByte(CP_UTF8,0,input.c_str(),-1,nullptr,0,nullptr,nullptr);
@@ -43,6 +44,7 @@ std::filesystem::path known_folder(REFKNOWNFOLDERID id) {
 }
 bool prepare_runtime(HINSTANCE instance, const std::filesystem::path& root) {
     return extract(instance,R_SCRIPT,root/L"run-trackpad.ps1") && extract(instance,R_BRIDGE,root/L"src"/L"HidMaestroBridge.cs")
+        && extract(instance,R_HIDMAESTRO_LICENSE,root/L"build"/L"hidmaestro"/L"LICENSE")
         && extract(instance,R_HIDMAESTRO,root/L"build"/L"hidmaestro"/L"HIDMaestro.Core.dll") && extract(instance,R_DESCRIPTOR,root/L"experiments"/L"hidmaestro"/L"spacemouse-pro.hex")
         && extract(instance,R_HOOK_MAIN,root/L"browser-extension"/L"main-hook.js") && extract(instance,R_HOOK_RELAY,root/L"browser-extension"/L"relay.js")
         && extract(instance,R_HOOK_MANIFEST,root/L"browser-extension"/L"manifest.json") && extract(instance,R_CONFIG,root/L"TrackPad CAD.json",true);
@@ -70,7 +72,7 @@ bool register_app(const std::filesystem::path& executable) {
     if(RegCreateKeyExW(HKEY_CURRENT_USER,subkey,0,nullptr,0,KEY_SET_VALUE,nullptr,&key,nullptr)!=ERROR_SUCCESS) return false;
     auto set_text=[&](const wchar_t* name,const std::wstring& value) { return RegSetValueExW(key,name,0,REG_SZ,reinterpret_cast<const BYTE*>(value.c_str()),static_cast<DWORD>((value.size()+1)*sizeof(wchar_t)))==ERROR_SUCCESS; };
     DWORD one=1;
-    const bool result=set_text(L"DisplayName",L"TrackPad CAD") && set_text(L"DisplayVersion",L"1.0.3") && set_text(L"Publisher",L"TrackPad CAD")
+    const bool result=set_text(L"DisplayName",L"TrackPad CAD") && set_text(L"DisplayVersion",L"1.0.4") && set_text(L"Publisher",L"TrackPad CAD")
         && set_text(L"InstallLocation",executable.parent_path().wstring()) && set_text(L"DisplayIcon",executable.wstring())
         && set_text(L"UninstallString",quote(executable)+L" --uninstall")
         && RegSetValueExW(key,L"NoModify",0,REG_DWORD,reinterpret_cast<const BYTE*>(&one),sizeof(one))==ERROR_SUCCESS
